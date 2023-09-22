@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PowerPlus</title>
+    <link rel="shortcut icon" href="logo.png" type="image/x-icon">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.7/css/all.css">
+</head>
+<body>
+   <!-- header -->
+    <header class="header">
+      
+        <nav class="navbar">
+            <a href="#" class="nav-logo"><img src="l.png" alt=""></a>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#Home" class="nav-link" ><span style="color: rgb(112, 90, 179);">Home</span> </a>
+                </li>
+               
+                <li class="nav-item">
+                    <a href="#About" class="nav-link">About</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#contact" class="nav-link">Contact</a>
+                </li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </nav>
+</header> 
+    
+    <!-- header ends -->
+
+    <!-- body -->
+        <div class="intro">
+          <h1>POWERPLUS</h1>
+          <p>Your Project Companion...</p>
+          <button>Learn More</button>
+        
+        </div>
+        
+        <!-- Features -->
+         <div class="achievements">
+          <p id="Features"></p>
+          <div class="work"> 
+            <a href="">  <i class="fas fa-atom"></i></a>
+        <p class="work-heading">Electrical Projects</p>
+            
+            </div>
+            <div class="work"> 
+              <a href="">  <i class="fas fa-atom"></i></a>
+          <p class="work-heading">Electronics Projects</p>
+              
+              </div>
+  
+
+            <div class="work"> 
+              <a href=""> <i class="fas fa-atom"></i> </a>
+             <p class="work-heading">Embedded Projects</p>
+            
+            </p>
+          </div>
+        </div>
+    
+        <!-- about section -->
+       <div class="wrapper">
+        <p id="About"></p>
+        <div class="row">
+            <div class="image-section">
+                <img src="about.png">
+            </div>
+            <div class="content">
+                <h1>About</h1>
+                <p>**************************************************************.</p>
+            </div>
+        </div>
+    </div>
+    <!-- footer section -->
+       <section class="footer">
+        <div class="social">
+          <p id="contact"></p>
+          <a href="#"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-linkedin"></i></a>
+          <a href="#"><i class="fab fa-twitter"></i></a>
+          <a href="#"><i class="fab fa-facebook-f"></i></a>
+        </div>
+  
+        <ul class="list">
+          <li>
+            <a href="#">Home</a>
+          </li>
+          <li>
+            <a href="#">Services</a>
+          </li>
+          <li>
+            <a href="#">About</a>
+          </li>
+          <li>
+            <a href="#">Terms</a>
+          </li>
+          <li>
+            <a href="#">Privacy Policy</a>
+          </li>
+        </ul>
+        <p class="copyright">Future Coders @ 2022</p>
+      </section>
+
+    <!-- body ends -->
+    <script src="script.js"></script>
+    <script>
+      const hamburger = document.querySelector(".hamburger");
+const navMenu = document.querySelector(".nav-menu");
+
+hamburger.addEventListener("click", mobileMenu);
+
+function mobileMenu() {
+  hamburger.classList.toggle("active");
+  navMenu.classList.toggle("active");
+}
+const navLink = document.querySelectorAll(".nav-link");
+
+navLink.forEach(n => n.addEventListener("click", closeMenu));
+
+function closeMenu() {
+  hamburger.classList.remove("active");
+  navMenu.classList.remove("active");
+}
+
+  
+
+  </script>
+</body>
+</html>
