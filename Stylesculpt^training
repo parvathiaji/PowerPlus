@@ -1,0 +1,136 @@
+
+selected_model = 'lookbook'
+
+# Load model
+import torch
+import numpy as np
+from PIL import Image
+from models import get_instrumented_model
+from decomposition import get_or_compute
+from config import Config
+
+# Speed up computation
+torch.autograd.set_grad_enabled(False)
+torch.backends.cudnn.benchmark = True
+
+# Specify model to use
+config = Config(
+  model='StyleGAN2',
+  layer='style',
+  output_class=selected_model,
+  components=20,
+  use_w=True,
+  batch_size=5_000, # style layer quite small
+)
+
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+inst = get_instrumented_model(config.model, config.output_class,
+                              config.layer, device, use_w=config.use_w)
+
+path_to_components = get_or_compute(config, inst)
+
+model = inst.model
+
+comps = np.load(path_to_components)
+lst = comps.files
+latent_dirs = []
+latent_stdevs = []
+
+load_activations = False
+
+for item in lst:
+    if load_activations:
+      if item == 'act_comp':
+        for i in range(comps[item].shape[0]):
+          latent_dirs.append(comps[item][i])
+      if item == 'act_stdev':
+        for i in range(comps[item].shape[0]):
+          latent_stdevs.append(comps[item][i])
+    else:
+      if item == 'lat_comp':
+        for i in range(comps[item].shape[0]):
+          latent_dirs.append(comps[item][i])
+      if item == 'lat_stdev':
+        for i in range(comps[item].shape[0]):
+          latent_stdevs.append(comps[item][i])
+
+
+
+
+
+#@title Define functions
+def display_sample_pytorch(seed, truncation, directions, distances, scale, start, end, w=None, disp=True, save=None, noise_spec=None):
+    # blockPrint()
+    model.truncation = truncation
+    if w is None:
+        w = model.sample_latent(1, seed=seed).detach().cpu().numpy()
+        w = [w]*model.get_max_latents() # one per layer
+    else:
+        w = [np.expand_dims(x, 0) for x in w]
+    
+    for l in range(start, end):
+      for i in range(len(directions)):
+        w[l] = w[l] + directions[i] * distances[i] * scale
+    
+    torch.cuda.empty_cache()
+    #save image and display
+    out = model.sample_np(w)
+    final_im = Image.fromarray((out * 255).astype(np.uint8)).resize((500,500),Image.LANCZOS)
+    
+    
+    if save is not None:
+      if disp == False:
+        print(save)
+      final_im.save(f'out/{seed}_{save:05}.png')
+    if disp:
+      display(final_im)
+    
+    return final_im
+
+
+
+
+
+
+
+import gradio as gr
+
+def generate_image(seed, fabric_color, dress_type):
+    seed = int(seed)
+    # Map fabric color and dress type to latent directions and distances (customize this logic based on your model)
+    directions = []
+    distances = []
+
+    if fabric_color == "Red":
+        directions.append(latent_dirs[0])  # Example mapping
+        distances.append(10)  # Example distance
+    elif fabric_color == "Blue":
+        directions.append(latent_dirs[1])
+        distances.append(15)
+
+    if dress_type == "Jacket":
+        directions.append(latent_dirs[2])
+        distances.append(5)
+    elif dress_type == "Coat":
+        directions.append(latent_dirs[3])
+        distances.append(8)
+
+    # Additional settings for image generation
+    start_layer = 0
+    end_layer = 14
+    truncation = 0.5
+
+    # Generate the image using the selected parameters
+    return display_sample_pytorch(seed, truncation, directions, distances, scale, int(start_layer), int(end_layer), disp=False)
+
+# Inputs for the seed, fabric color, and dress type
+seed = gr.inputs.Number(default=0, label="Seed")
+fabric_color = gr.inputs.Dropdown(choices=["Red", "Blue", "Green", "Yellow"], label="Fabric Color", default="Red")
+dress_type = gr.inputs.Dropdown(choices=["Jacket", "Coat", "Dress", "Blouse"], label="Dress Type", default="Jacket")
+
+# List of inputs
+inputs = [seed, fabric_color, dress_type]
+
+# Launch demo
+gr.Interface(generate_image, inputs, ["image"], live=True, title="ClothingGAN").launch(debug=True)
